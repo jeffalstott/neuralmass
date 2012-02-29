@@ -1,8 +1,11 @@
 clear all
 close all
 
-load macaque47
-name = 'M47'
+%load macaque47
+%name = 'M47'
+load DSI_enhanced
+CIJ = CIJ_resampled_average;
+name = 'Hagmann'
 %
 %R = size(CIJr,3);
 I = 8;  % repeats

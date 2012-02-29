@@ -109,16 +109,12 @@ for s=1:lseg
     Zall = [Zall Z(1:end-1,:)'];
     Wall = [Wall W(1:end-1,:)'];
 end;
-% delete the small segements...
-for s=1:lseg
-    eval(['delete ',rn,'_part',num2str(s),'.mat']);
-end;
 
 % COMPUTE BOLD SIGNAL ==============================
 % using the nonlinear balloon-windkessel model...
 disp('beginning bold calculation ...');
 tic;
-Ybold = adachi_Yall_bold(Vall);
+Ybold = Yall_bold(Vall);
 Ybold = Ybold';
 % eval(['save ',rn,'_Ybold Ybold']);
 toc;
@@ -150,5 +146,10 @@ end;
 % save processed BOLD data
 %eval(['save ',rn,'_Ybold_proc Ybold_w Ybold_w_mean Ybold_w_reg C R T xsec xgap']);
 eval(['save ',rn,'_Ybold_proc Vall Zall Wall Ybold_w Ybold_w_mean Ybold_w_reg C R T xsec xgap']);
+
+% delete the small segements...
+for s=1:lseg
+    eval(['delete ',rn,'_part',num2str(s),'.mat']);
+end;
 
 disp('... all done ...');
