@@ -1,4 +1,4 @@
-function  Ybold = adachi_Yall_bold(Yall)
+function  Ybold = Yall_bold(Yall)
 
 Yall = Yall';
 tfrom = 1;
@@ -28,6 +28,7 @@ options = odeset('RelTol',1e-3,'AbsTol',1e-6);
 
 % loop over time series
 for n=1:N
+    disp(['Analyzing channel: ',num2str(n)]);
     
     % get time series
     z = Yall(tfrom:tto,n);
