@@ -1,4 +1,4 @@
-function [C] = BOLD_calc(rn,Y)
+rn = 1
 % COMPUTE BOLD SIGNAL ==============================
 % using the nonlinear balloon-windkessel model...
 disp('beginning bold calculation ...');
