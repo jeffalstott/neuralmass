@@ -5,12 +5,13 @@ close all
 %name = 'M47'
 load DSI_enhanced
 CIJ = CIJ_resampled_average;
-name = 'Hagmann'
+dataset_name = 'Hagmann'
+
 %
 %R = size(CIJr,3);
 I = 8;  % repeats
 
-Call = zeros(47,47,I);
+Call = zeros(size(CIJ,1),size(CIJ,2),I);
 
 for i=1:I
     rn = [name,'_',num2str(i)];

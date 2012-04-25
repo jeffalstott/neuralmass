@@ -33,7 +33,7 @@ else
       args="${args} ${token}" 
       shift
   done
-  eval "${exe_dir}"/Hagmann $args
+  eval "${exe_dir}"/sim_function $args
 fi
 exit
 

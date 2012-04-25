@@ -1,4 +1,8 @@
-function [C] = sim_function(rn,CIJ)
+function [C] = sim_function(run_id,CIJ_file,lseg)
+
+rn = stract(CIJ_file, '_', run_id)
+CIJ = h5read(CIJ_file, '/CIJ')
+lseg = str2num(lseg)
 
 % set random number seed - comment out if desired
 %rand('state',666);
@@ -8,7 +12,6 @@ function [C] = sim_function(rn,CIJ)
 global V1 V2 V3 V4 V5 V6 V7 gCa gK gL VK VL VCa I b ani aei aie aee phi V8 V9 gNa VNa ane nse rnmda N CM vs c k_in
 
 % runname
-%rn = 'M47_005_2';
 init = 'randm';     % set if random initial condition is desired
 %init = 'saved';     % set if an earlier saved initial condition is to be used
 
@@ -38,8 +41,8 @@ end;
 % TIME PARAMS =====================================
 % length of run and initial transient
 % (in time segments, 1 tseg = l timesteps
-tseg = 2;       % number of segments used in the intial transient
-lseg = 20;      % number of segments used in the actual run
+tseg = 2      % number of segments used in the intial transient
+lseg      % number of segments used in the actual run
 llen = 60000;   % length of each segment, in milliseconds
 tres = 0.2;     % time resolution of model output, in milliseconds
 
@@ -110,42 +113,15 @@ for s=1:lseg
     Wall = [Wall W(1:end-1,:)'];
 end;
 
-% COMPUTE BOLD SIGNAL ==============================
-% using the nonlinear balloon-windkessel model...
-disp('beginning bold calculation ...');
-tic;
-Ybold = Yall_bold(Vall);
-Ybold = Ybold';
-% eval(['save ',rn,'_Ybold Ybold']);
-toc;
+t = size(Vall,2)
+h5create(strcat(rn, '.h5'), '/V', [N t])
+h5create(strcat(rn, '.h5'), '/Z', [N t])
+h5create(strcat(rn, '.h5'), '/W', [N t])
+h5create(strcat(rn, '.h5'), '/BOLD', [N t])
 
-% COMPUTE SOME BASIC BOLD SIGNAL ANALYSES ==========
-% settings for bold averages
-T = size(Ybold,2);
-xsec = 2000; xgap = 500;        % in msec, window size and spacing
-t0 = [1:xgap:T-xsec+1];
-te = [xsec:xgap:T];
-% initialize...
-Ybold_w = zeros(N,length(t0));
-% compute bold averages
-for w=1:length(t0)
-    Ybold_w(:,w) = mean(Ybold(:,t0(w):te(w)),2);
-end;
-
-% remove NaNs, get average bold signal over whole brain, and regress out
-Ybold_w(isnan(Ybold_w)) = 0;
-Ybold_w_mean = mean(Ybold_w);
-Ybold_w_reg = zeros(N,length(t0));
-for i=1:N
-    [B,BINT,Ybold_w_reg(i,:)] = regress(Ybold_w(i,:)',Ybold_w_mean');
-end;
-
-% get BOLD cross-correlations
-[C,R] = corr(Ybold_w_reg');
-
-% save processed BOLD data
-%eval(['save ',rn,'_Ybold_proc Ybold_w Ybold_w_mean Ybold_w_reg C R T xsec xgap']);
-eval(['save ',rn,'_Ybold_proc Vall Zall Wall Ybold_w Ybold_w_mean Ybold_w_reg C R T xsec xgap']);
+h5write(filename, '/V', Vall, [1 1], [N t])
+h5write(filename, '/Z', Vall, [1 1], [N t])
+h5write(filename, '/W', Vall, [1 1], [N t])
 
 % delete the small segements...
 for s=1:lseg
