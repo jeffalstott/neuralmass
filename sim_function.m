@@ -1,8 +1,8 @@
 function [C] = sim_function(run_id,CIJ_file,lseg)
 
-rn = stract(CIJ_file, '_', run_id)
-CIJ = h5read(CIJ_file, '/CIJ')
-lseg = str2num(lseg)
+rn = strcat('sim',run_id, '_', CIJ_file);
+CIJ = h5read(CIJ_file, '/CIJ');
+lseg = str2num(lseg);
 
 % set random number seed - comment out if desired
 %rand('state',666);

@@ -2,8 +2,8 @@ function  Ybold = Yall_bold(Yall)
 
 Yall = Yall';
 tfrom = 1;
-tto = size(Yall,1)
-N = size(Yall,2)
+tto = size(Yall,1);
+N = size(Yall,2);
 
 % Solve BOLD ODEs
 % x(1) = s = vasodilatory signal
@@ -28,7 +28,7 @@ options = odeset('RelTol',1e-3,'AbsTol',1e-6);
 
 % loop over time series
 for n=1:N
-    disp(['Analyzing channel: ',num2str(n)]);
+    %disp(['Analyzing channel: ',num2str(n)]);
     tic;
     
     % get time series
