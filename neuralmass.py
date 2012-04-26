@@ -4,7 +4,7 @@ def sim_function2biowulf(CIJ_filename,
         run_id,
         duration,
         memory_requirement = 72,
-        mex_file_directory = '/home/alstottj/Code/neuralmass/',
+        mex_file_directory = '/data/LesionedBrains/neuralmass/',
         mex_filename = 'sim_function'):
 
     swarm = biowulf.Swarm(memory_requirement=memory_requirement)
@@ -25,7 +25,7 @@ def sim_function2biowulf(CIJ_filename,
 def V2BOLD2biowulf(sim_filename,
         channels = None,
         memory_requirement = 4,
-        mex_file_directory = '/home/alstottj/Code/neuralmass/',
+        mex_file_directory = '/data/LesionedBrains/neuralmass/',
         mex_filename = 'V2BOLD',
         variable = 'V'):
 
