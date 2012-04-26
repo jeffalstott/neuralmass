@@ -1,35 +1,76 @@
-def matlab2biowulf_H5(data_filename,
+from Helix import biowulf
+
+def sim_function2biowulf(CIJ_filename,
+        run_id,
+        duration,
+        memory_requirement = 72,
+        mex_file_directory = '/home/alstottj/Code/neuralmass/',
+        mex_filename = 'sim_function'):
+
+    swarm = biowulf.Swarm(memory_requirement=memory_requirement)
+    job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s %i" % (mex_filename, run_id, CIJ_filename, duration)
+    swarm.add_job(job_string, no_python=True)
+    swarm.submit()
+
+    dir, filename = CIJ_filename.rsplit('/',1)
+    dir = dir+'/'
+    if filename[-3:]=='.h5':
+        sim_filename = dir+'sim'+str(run_id)+'_'+filename
+    else:
+        sim_filename = dir+'sim'+str(run_id)+'_'+filename+'.h5'
+
+    return sim_filename
+
+
+def V2BOLD2biowulf(sim_filename,
+        channels = None,
         memory_requirement = 4,
         mex_file_directory = '/home/alstottj/Code/neuralmass/',
-        mex_filename = 'V2BOLD_H5',
-        variable = 'V',
-        channels = None,
-        run_id = None,
-        duration = None):
+        mex_filename = 'V2BOLD',
+        variable = 'V'):
 
-    if variable and not channels:
+    if not channels:
         import h5py
-        f = h5py.File(data_filename)
+        f = h5py.File(sim_filename)
         n_time_steps, n_channels = f[variable].shape
-        channels = range(1,n_channels+1)
+        channels = range(n_channels)
 
-    import biowulf
+    dir, sim_filename = sim_filename.rsplit('/',1)
+    dir = dir+'/'
+
     swarm = biowulf.Swarm(memory_requirement=memory_requirement)
-    if variable:
-        for i in channels:
-            print i
-            job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s" % (mex_filename, i, data_filename)
-            swarm.add_job(job_string, no_python=True)
-    elif run_id and duration:
-        job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s %i" % (mex_filename, run_id, data_filename, duration)
-        swarm.add_job(job_string, no_python=True)
-    elif run_id:
-        job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s" % (mex_filename, run_id, data_filename)
-        swarm.add_job(job_string, no_python=True)
-    else:
-        job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %s" % (mex_filename, data_filename)
+    for i in channels:
+        print i
+        job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s %s" % (mex_filename, i, sim_filename, dir)
         swarm.add_job(job_string, no_python=True)
 
     swarm.submit()
 
+def combineBOLD(sim_filename,
+        channels = None):
 
+    dir, sim_filename = sim_filename.rsplit('/',1)
+    dir = dir+'/'
+    from os import listdir, remove
+    dirfiles = listdir(dir)
+    if not channels:
+        channels = []
+        for i in dirfiles:
+            if i.startswith('BOLDchan') and i.endswith(sim_filename):
+                channels.append(int(i.split('_')[0][8:]))
+
+    import h5py
+    B = h5py.File(dir+'BOLDchan'+str(channels[0])+'_'+sim_filename)['BOLD']
+    f = h5py.File(dir+'BOLD_'+sim_filename)
+    if 'BOLD' not in list(f):
+        from numpy import empty, max
+        f['BOLD'] = empty((max(channels)+1,len(B)))
+
+    for i in channels:
+        B = h5py.File(dir+'BOLDchan'+str(i)+'_'+sim_filename)['BOLD'][:,:]
+        f['BOLD'][i] = B.flatten()
+
+    f.close()
+    for i in dirfiles:
+        if i.startswith('BOLD') and i.endswith(sim_filename):
+            remove(dir+i)

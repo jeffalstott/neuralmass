@@ -1,7 +1,11 @@
 function [C] = sim_function(run_id,CIJ_file,lseg)
 
+if strcmp(CIJ_file(end-2:end),'.h5')
+    CIJ_file=CIJ_file(1:end-3)
+end;
+
 rn = strcat('sim',run_id, '_', CIJ_file);
-CIJ = h5read(CIJ_file, '/CIJ');
+CIJ = h5read(strcat(CIJ_file, '.h5'), '/CIJ');
 lseg = str2num(lseg);
 
 % set random number seed - comment out if desired
@@ -114,14 +118,14 @@ for s=1:lseg
 end;
 
 t = size(Vall,2)
-h5create(strcat(rn, '.h5'), '/V', [N t])
-h5create(strcat(rn, '.h5'), '/Z', [N t])
-h5create(strcat(rn, '.h5'), '/W', [N t])
-h5create(strcat(rn, '.h5'), '/BOLD', [N t])
+output_file = strcat(rn, '.h5')
+h5create(output_file, '/V', [N t])
+h5create(output_file, '/Z', [N t])
+h5create(output_file, '/W', [N t])
 
-h5write(filename, '/V', Vall, [1 1], [N t])
-h5write(filename, '/Z', Vall, [1 1], [N t])
-h5write(filename, '/W', Vall, [1 1], [N t])
+h5write(output_file, '/V', Vall, [1 1], [N t])
+h5write(output_file, '/Z', Zall, [1 1], [N t])
+h5write(output_file, '/W', Wall, [1 1], [N t])
 
 % delete the small segements...
 for s=1:lseg
