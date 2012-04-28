@@ -7,13 +7,13 @@ def sim_function2biowulf(CIJ_filename,
         mex_file_directory = '/data/LesionedBrains/neuralmass/',
         mex_filename = 'sim_function'):
 
+    dir, filename = CIJ_filename.rsplit('/',1)
+    dir = dir+'/'
     swarm = biowulf.Swarm(memory_requirement=memory_requirement)
-    job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %s %i" % (mex_filename, run_id, CIJ_filename, duration)
+    job_string = mex_file_directory+"run_%s.sh /usr/local/matlab64 %i %i %s %s" % (mex_filename, duration, run_id, filename, dir)
     swarm.add_job(job_string, no_python=True)
     swarm.submit()
 
-    dir, filename = CIJ_filename.rsplit('/',1)
-    dir = dir+'/'
     if filename[-3:]=='.h5':
         sim_filename = dir+'sim'+str(run_id)+'_'+filename
     else:

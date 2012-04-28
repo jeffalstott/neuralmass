@@ -1,11 +1,12 @@
-function [C] = sim_function(run_id,CIJ_file,lseg)
+function [C] = sim_function(lseg, run_id, CIJ_file, directory)
+disp('Actually running the latest version')
 
 if strcmp(CIJ_file(end-2:end),'.h5')
     CIJ_file=CIJ_file(1:end-3)
 end;
 
-rn = strcat('sim',run_id, '_', CIJ_file);
-CIJ = h5read(strcat(CIJ_file, '.h5'), '/CIJ');
+rn = strcat(directory, 'sim',run_id, '_', CIJ_file);
+CIJ = h5read(strcat(directory, CIJ_file, '.h5'), '/CIJ');
 lseg = str2num(lseg);
 
 % set random number seed - comment out if desired
